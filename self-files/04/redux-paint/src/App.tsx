@@ -1,13 +1,22 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { beginStroke, endStroke, updateStroke } from "./actions";
-import { drawStroke } from "./canvasUtils";
+import { clearCanvas, drawStroke } from "./canvasUtils";
 import { ColorPanel } from "./ColorPanel";
-import { currentStrokeSelector } from "./selectors";
+import { EditPanel } from "./EditPanel";
+import {
+  currentStrokeSelector,
+  historyIndexSelector,
+  strokesSelector,
+} from "./selectors";
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const currentStroke = useSelector(currentStrokeSelector);
+  const historyIndex = useSelector(historyIndexSelector);
+  const strokes = useSelector(strokesSelector);
+
   const isDrawing = !!currentStroke.points.length;
   const dispatch = useDispatch();
 
@@ -46,8 +55,24 @@ function App() {
     );
   }, [currentStroke]);
 
+  useEffect(() => {
+    const { canvas, context } = getCanvasWithContext();
+    if (!context || !canvas) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      clearCanvas(canvas);
+
+      strokes.slice(0, strokes.length - historyIndex).forEach((stroke) => {
+        drawStroke(context, stroke.points, stroke.color);
+      });
+    });
+  }, [historyIndex]);
+
   return (
     <>
+      <EditPanel />
       <ColorPanel />
       <canvas
         onMouseDown={startDrawing}

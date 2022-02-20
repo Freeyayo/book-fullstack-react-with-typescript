@@ -6,6 +6,9 @@ export const END_STROKE = "END_STROKE";
 
 export const SET_STROKE_COLOR = "SET_STROKE_COLOR";
 
+export const UNDO = "UNDO";
+export const REDO = "REDO";
+
 export type Action =
   | {
       type: typeof BEGIN_STROKE;
@@ -37,4 +40,12 @@ export const endStroke = () => {
 
 export const setStrokeColor = (color: string) => {
   return { type: SET_STROKE_COLOR, payload: color };
+};
+
+export const undo = (undoLimit: number) => {
+  return { type: UNDO, payload: undoLimit };
+};
+
+export const redo = () => {
+  return { type: REDO };
 };
